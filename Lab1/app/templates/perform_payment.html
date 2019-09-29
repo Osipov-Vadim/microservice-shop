@@ -1,0 +1,39 @@
+<html>
+    <head>
+        {% if title %}
+       		<title>{{ title }}</title>
+        {% else %}
+        		<title>{{ 'Payment service'}}</title>
+        {% endif %}
+    </head>
+    <body>
+
+    <form method="post">
+        {{ form.hidden_tag() }}
+ 			<p>
+            {{ form.username.label }}<br>
+            {{ form.username(size=32) }}<br>
+            {% for error in form.username.errors %}
+            <span style="color: red;">[{{ error }}]</span>
+            {% endfor %}
+        </p>
+       <p>
+            {{ form.status.label }}<br>
+            {{ form.status() }}<br>
+				{% for error in form.status.errors %}
+            <span style="color: red;">[{{ error }}]</span>
+            {% endfor %}
+        </p>
+       <p>
+            {{ form.submit() }}<br>
+				{% for error in form.submit.errors %}
+            <span style="color: red;">[{{ error }}]</span>
+            {% endfor %}
+        </p>
+			{% for error in form.submit.errors %}
+            <span style="color: red;">[{{ error }}]</span>
+         {% endfor %}
+    </body>
+</html>
+
+
