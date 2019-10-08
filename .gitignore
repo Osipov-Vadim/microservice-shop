@@ -2,3 +2,5 @@ Catalog-Service/.vscode/
 Catalog-Service/__pycache__/
 Catalog-Service/models/__pycache__/
 .vscode/
+items.db
+.idea

@@ -1,6 +1,7 @@
 from models.base import Base
 from sqlalchemy import Column, Integer, Text, String, Float
 
+
 class Item(Base):
     __tablename__ = "items"
 
@@ -15,7 +16,7 @@ class Item(Base):
         self.price = price
 
     def __repr__(self):
-        return "Item: {     \
-            name: '%s',     \
-            amount: '%s',   \
-            price: '%s'" % (self.name, self.amount, self.price)
+        return """Item: {     
+            "name": \"%s\",     
+            "amount": \"%s\",   
+            "price": \"%s\" """ % (self.name, self.amount, self.price)
