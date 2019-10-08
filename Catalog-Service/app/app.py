@@ -2,12 +2,10 @@ import hug
 
 from db import SQLAlchemy, SQLAlchemyContext, SQlAlchemySession
 from models.base import Base
-import api
-from models.Item import Item
-
+import routers
 
 database = SQLAlchemy()
-database.init_app("sqlite:///:memory:")
+database.init_app("sqlite:///items.db")
 Base.metadata.create_all(bind=database.engine)
 
 
@@ -24,4 +22,4 @@ def delete_context(
 
 @hug.extend_api()
 def apis():
-    return [api]
+    return [routers]
