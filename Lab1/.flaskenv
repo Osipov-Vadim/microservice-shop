@@ -1,2 +1,0 @@
-FLASK_APP=service.py
-FLASK_DEBUG = 1

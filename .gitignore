@@ -1,6 +1,7 @@
-Catalog-Service/.vscode/
-Catalog-Service/__pycache__/
-Catalog-Service/models/__pycache__/
-.vscode/
+Catalog-Service/app/__pycache__
+Catalog-Service/app/models/__pycache__
+Payment-Service/app/__pycache__
+Payment-Service/app/models/__pycache__
 items.db
+pay_info.db
 .idea
