@@ -8,12 +8,12 @@ class Order(Base):
 
     id = Column(Integer, primary_key=True)
     username = Column(String)
-    status = Column(Enum(OrderStatus))
+    status = Column(String)
     totalCost = Column(Float)
-    totalAmount = Column(int)
+    totalAmount = Column(Integer)
 
-    def __init__(self, username,):
+    def __init__(self, username):
         self.username = username
-        self.status = OrderStatus.COLLECTING
+        self.status = OrderStatus.COLLECTING.value
         self.totalCost = 0.0
         self.totalAmount = 0

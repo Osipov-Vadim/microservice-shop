@@ -1,14 +1,14 @@
 from statemachine import StateMachine, State
-from models.OrderStatus import OrderStatus
+from models.OrderStatus import OrderStatus as OrS
 
 
 class OrderStatusMachine(StateMachine):
-    COLLECTING = State(OrderStatus.COLLECTING, initial=True)
-    PAID = State(OrderStatus.PAID)
-    FAILED = State(OrderStatus.FAILED)
-    SHIPPING = State(OrderStatus.SHIPPING)
-    CANCELLED = State(OrderStatus.CANCELLED)
-    COMPLETE = State(OrderStatus.COMPLETE)
+    COLLECTING = State(OrS.COLLECTING, initial=True)
+    PAID = State(OrS.PAID)
+    FAILED = State(OrS.FAILED)
+    SHIPPING = State(OrS.SHIPPING)
+    CANCELLED = State(OrS.CANCELLED)
+    COMPLETE = State(OrS.COMPLETE)
 
     paid = COLLECTING.to(PAID)
     failed = COLLECTING.to(FAILED)
@@ -18,11 +18,11 @@ class OrderStatusMachine(StateMachine):
 
 
 def is_possible_to_change_status(cur_state: str, new_state: str):
-    if cur_state == OrderStatus.COLLECTING and \
-            (new_state == OrderStatus.PAID or new_state == OrderStatus.FAILED) or \
-            cur_state == OrderStatus.PAID and \
-            (new_state == OrderStatus.SHIPPING or new_state == OrderStatus.CANCELLED) or \
-            cur_state == OrderStatus.SHIPPING and \
-            (new_state == OrderStatus.COMPLETE):
+    if cur_state == OrS.COLLECTING.value and \
+            (new_state == OrS.PAID.value or new_state == OrS.FAILED.value) or \
+            cur_state == OrS.PAID.value and \
+            (new_state == OrS.SHIPPING.value or new_state == OrS.CANCELLED.value) or \
+            cur_state == OrS.SHIPPING.value and \
+            (new_state == OrS.COMPLETE.value):
         return True
     return False
