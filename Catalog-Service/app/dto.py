@@ -9,7 +9,6 @@ from pydantic import BaseModel
 #                      ['name', 'amount', 'price'])
 
 class ItemDto(BaseModel):
-    # def __init__(self, id, name, amount, price):
     id: int
     name: str
     amount: int
@@ -17,7 +16,6 @@ class ItemDto(BaseModel):
 
 
 class CItemDto(BaseModel):
-    # def __init__(self, id, name, amount, price):
     name: str
     amount: int
     price: float
