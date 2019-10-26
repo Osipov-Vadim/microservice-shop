@@ -1,5 +1,5 @@
 from statemachine import StateMachine, State
-from models.OrderStatus import OrderStatus as OrS
+from order_service.models.order_status import OrderStatus as OrS
 
 
 class OrderStatusMachine(StateMachine):

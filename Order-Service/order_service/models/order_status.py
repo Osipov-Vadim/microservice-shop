@@ -8,3 +8,7 @@ class OrderStatus(enum.Enum):
     SHIPPING = "SHIPPING"
     CANCELLED = "CANCELLED"
     COMPLETE = "COMPLETE"
+
+    @classmethod
+    def choices(cls):
+        return tuple((i.name, i.value) for i in cls)
