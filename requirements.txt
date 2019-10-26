@@ -1,3 +1,5 @@
+djangorestframework
+django
 statemachine
 requests
 falcon
