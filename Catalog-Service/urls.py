@@ -26,5 +26,5 @@ from django.conf.urls import include
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', include('catalog_service.urls'))
+    path('', include('catalog_service.urls')),
 ]
