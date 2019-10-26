@@ -10,7 +10,3 @@ class CardAuthorizationInfo(enum.Enum):
 class UserDetailsDto(BaseModel):
     username: str
     cardAuthorizationInfo: CardAuthorizationInfo
-
-
-class OrderDto(BaseModel):
-    id: int
