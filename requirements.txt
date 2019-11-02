@@ -1,6 +1,0 @@
-djangorestframework
-django
-statemachine
-requests
-falcon
-pydantic
