@@ -17,7 +17,7 @@ from django.contrib import admin
 from django.urls import path
 from rest_framework_swagger.views import get_swagger_view
 
-from routers import *
+from .routers import *
 
 schema_view = get_swagger_view(title='API Gateway')
 
