@@ -5,3 +5,4 @@ pydantic
 statemachine
 requests
 falcon
+python-statemachine
