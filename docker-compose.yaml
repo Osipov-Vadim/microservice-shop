@@ -1,6 +1,18 @@
 version: '3'
 
 services:
+  rabbitmq-service:
+    image: rabbitmq:management
+    ports:
+      - 15672:15672
+      - 5672:5672
+    restart: always
+    environment:
+      - RABBITMQ_DEFAULT_USER=test_user
+      - RABBITMQ_DEFAULT_PASS=test_pass
+
+    container_name: rabbitmq-service
+
   payment-service:
     build: ./payment-service
     volumes:
