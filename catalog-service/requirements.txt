@@ -1,7 +1,2 @@
-djangorestframework
 django
-django-rest-swagger
 pydantic
-statemachine
-requests
-falcon

@@ -1,5 +1,8 @@
-*__pycache__*
-*.db*
-*.idea*
-*.sqlite3*
+.idea
+__pycache__
+media
+static
+*.db
+*.sqlite3
+venv
 
