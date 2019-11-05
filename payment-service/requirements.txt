@@ -1,0 +1,7 @@
+djangorestframework
+django
+django-rest-swagger
+pydantic
+requests
+falcon
+python-statemachine
