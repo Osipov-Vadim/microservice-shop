@@ -1,25 +1,33 @@
 # microservice-shop
-Laboratory work on the course "Software Development Technology"
+Laboratory work on the course "Software Development Technology"  
+
+This is an example of a simple online shop based on microservice architecture.  
+
+## Technology Stack
+
+- Nginx 
+- uWSGI 
+- Django
+- Django REST Framework
+- Swagger UI
+- SQlite
+- Docker
+
+## Build and run 
+
+To start all services:
+
+```
+docker-compose up --build
+```
+
+To start a specific service:
+
+``` 
+cd <path_to_service> 
+docker build -t <service_name> . 
+docker run -d -p 80:80 service_name>
+```
+ 
+
 ## Contributing
-Install requirements:
-```
-    pip install -r requirements.txt
-```
-To start the Catalog-Service use:
-```
-    cd Catalog-Service
-    python manage.py makemigrations && python manage.py migrate
-    python manage.py runserver 7777
-```
-To start the Order-Service use:
-```
-    cd Order-Service
-    python manage.py makemigrations && python manage.py migrate
-    python manage.py runserver 7778
-```
-To start the Payment-Service use:
-```
-    cd Payment-Service
-    python manage.py makemigrations && python manage.py migrate
-    python manage.py runserver 7779
-```

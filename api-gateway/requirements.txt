@@ -1,2 +1,5 @@
+pydantic
+requests
 django
 django-rest-swagger
+djangorestframework

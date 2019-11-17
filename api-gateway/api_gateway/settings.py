@@ -15,7 +15,6 @@ import os
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
-
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/2.2/howto/deployment/checklist/
 
@@ -25,8 +24,7 @@ SECRET_KEY = '&4n-=&#88xvr*5*7aa_)b*kqdu8#mbi-**y$q#3^^)rh^3ur89'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
-
+ALLOWED_HOSTS = ['localhost', '127.0.0.1', 'api-gateway']
 
 # Application definition
 
@@ -56,6 +54,17 @@ REST_FRAMEWORK = {
     'UNAUTHENTICATED_USER': None,
     'DEFAULT_SCHEMA_CLASS': 'rest_framework.schemas.coreapi.AutoSchema'
 }
+
+SWAGGER_SETTINGS = {
+    'JSON_EDITOR': True,
+    'DEFAULT_PARSER_CLASSES': (
+      'rest_framework.parsers.FormParser',
+      'rest_framework.parsers.MultiPartParser',
+      'rest_framework.parsers.JSONParser',
+    )
+}
+
+
 
 TEMPLATES = [
     {

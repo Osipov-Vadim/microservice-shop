@@ -1,14 +1,14 @@
 from django.http import HttpResponse, HttpResponseNotAllowed, HttpResponseServerError
 from django.http.response import JsonResponse
+from django.views.decorators.http import require_http_methods
 import json
-
-from django.http import HttpResponseRedirect
 
 from catalog_service.models.item import Item
 from catalog_service.dto.item_dto import ItemDto
 from catalog_service.dto.citem_dto import CItemDto
 
 
+@require_http_methods(["GET", "POST"])
 def items_handler(request):
     if request.method == 'GET':
         # get all items
@@ -35,33 +35,46 @@ def items_handler(request):
         return HttpResponseNotAllowed(['GET', 'POST'])
 
 
+@require_http_methods(["GET"])
 def get_item_by_id(request, item_id=None):
-    if request.method != 'GET':
-        return HttpResponseNotAllowed(['GET'])
-    return JsonResponse(Item.objects.get(id=item_id).to_dict())
+    # if request.method != 'GET':
+    #     return HttpResponseNotAllowed(['GET'])
+    return JsonResponse(
+        Item.objects.get(
+            id=item_id
+        ).to_dict()
+    )
 
 
+@require_http_methods(["PUT"])
 def add_existing_item(request, item_id=None, amount=0):
-    if request.method != 'PUT':
-        return HttpResponseNotAllowed(['PUT'])
+    # if request.method != 'PUT':
+    #     return HttpResponseNotAllowed(['PUT'])
     item = Item.objects.get(id=item_id)
     item.amount += amount
     item.save()
-    return JsonResponse(ItemDto(
-        id=item.id,
-        name=item.name,
-        amount=item.amount,
-        price=item.price).dict())
+    return JsonResponse(
+        ItemDto(
+            id=item.id,
+            name=item.name,
+            amount=item.amount,
+            price=item.price
+        ).dict()
+    )
 
 
+@require_http_methods(["PUT"])
 def dec_existing_item(request, item_id=None, amount=0):
-    if request.method != 'PUT':
-        return HttpResponseNotAllowed(['PUT'])
+    # if request.method != 'PUT':
+    #     return HttpResponseNotAllowed(['PUT'])
     item = Item.objects.get(id=item_id)
     item.amount -= amount
     item.save()
-    return JsonResponse(ItemDto(
-        id=item.id,
-        name=item.name,
-        amount=item.amount,
-        price=item.price).dict())
+    return JsonResponse(
+        ItemDto(
+            id=item.id,
+            name=item.name,
+            amount=item.amount,
+            price=item.price
+        ).dict()
+    )
