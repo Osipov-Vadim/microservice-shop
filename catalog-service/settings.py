@@ -24,7 +24,7 @@ SECRET_KEY = 'g=%@(gx!$swad@g8plisn!+kstt)q741hvoqxmwr29cpfn!e6l'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['192.168.99.100', '127.0.0.1']
+ALLOWED_HOSTS = ['localhost', '127.0.0.1', 'catalog-service']
 
 # Application definition
 
@@ -36,7 +36,6 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'catalog_service',
-    # 'rest_framework_swagger',
 ]
 
 MIDDLEWARE = [
@@ -47,10 +46,6 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
-
-# REST_FRAMEWORK = {
-#   'DEFAULT_SCHEMA_CLASS': 'rest_framework.schemas.coreapi.AutoSchema',
-# }
 
 ROOT_URLCONF = 'urls'
 

@@ -33,5 +33,5 @@ urlpatterns = [
     path('api/orders/<int:order_id>/item/', add_item_to_order),
     path('api/orders/<int:order_id>/status/<str:new_status>/', change_order_status),
     path('api/orders/<int:order_id>/payment/', perform_payment),
-    path("swagger/", schema_view),
+    path("api/swagger/", schema_view),
 ]
