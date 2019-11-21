@@ -1,16 +1,6 @@
-import enum
 from django.db import models
 from django.forms.models import model_to_dict
-
-
-class PaymentStatus(enum.Enum):
-    PAYING = "PAYING"
-    COMPLETED = "COMPLETED"
-    RETURNED = "RETURNED"
-
-    @classmethod
-    def choices(cls):
-        return tuple((i.name, i.value) for i in cls)
+from payment_service.models import PaymentStatus
 
 
 class PaymentInfo(models.Model):

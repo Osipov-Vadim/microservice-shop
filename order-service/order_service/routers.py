@@ -1,22 +1,14 @@
-from django.http import HttpResponse, HttpResponseNotAllowed, HttpResponseServerError
+from django.http import HttpResponse, HttpResponseServerError
 from django.http.response import JsonResponse
 from django.views.decorators.http import require_http_methods
-import json
+from django.core.exceptions import ObjectDoesNotExist
 
-from order_service.models.order import Order, OrderStatus
-from order_service.models.reserved_item import ReservedItem
-from order_service.models.traffic_light_machine import is_possible_to_change_status
-
-from order_service.dto.order_dto import OrderDto
-from order_service.dto.item_addition_parameters_dto import ItemAdditionParametersDto
-from order_service.dto.order_status_dto import OrderStatusDto
-from order_service.dto.order_id_dto import OrderIdDto
+from microservices_api import api, dto, serializers
+from .models import Order, OrderStatus, ReservedItem, is_possible_to_change_status
 
 
 @require_http_methods(["GET"])
 def get_orders(request):
-    # if request.method != 'GET':
-    #     return HttpResponseNotAllowed(['GET'])
     return JsonResponse(
         list(Order.objects.all().values()),
         safe=False
@@ -25,60 +17,76 @@ def get_orders(request):
 
 @require_http_methods(["GET"])
 def get_order_by_id(request, order_id=None):
-    # if request.method != 'GET':
-    #     return HttpResponseNotAllowed(['GET'])
+    try:
+        order = Order.objects.get(id=order_id)
+    except ObjectDoesNotExist:
+        return HttpResponseServerError("not order with id=%s" % order_id)
     return JsonResponse(
-        Order.objects.get(id=order_id).to_dict()
+        order.to_dict()
     )
 
 
 @require_http_methods(["POST"])
 def create_order(request):
-    # if request.method != 'POST':
-    #     return HttpResponseNotAllowed(['POST'])
-    addition_dto = None
+    # create items
     try:
-        addition_dto = ItemAdditionParametersDto(**json.loads(request.body))
-    except ValueError as e:
+        _data = serializers.parse_raw_data(request.body)
+    except:
         # TODO
-        return HttpResponseServerError("hmm")
+        return HttpResponseServerError("cant deserialize")
+
+    serializer = serializers.ItemAdditionParametersSerializer(
+        data=_data
+    )
+    if not serializer.is_valid():
+        # TODO
+        return HttpResponseServerError("cant parse item")
+
+    a_param = serializer.save()
     order = Order(
-        username=addition_dto.username,
+        username=a_param.username,
         status=OrderStatus.COLLECTING.value
     )
     order.save()
-    # TODO handle exc
-    order_id_dto = add_item_dto_to_order(addition_dto, order.id)
+
+    order_id = add_item_dto_to_order(a_param, order.id)
     return JsonResponse(
-        order_id_dto.dict()
+        order_id.dict()
     )
 
 
 @require_http_methods(["POST"])
 def add_item_to_order(request, order_id=None):
-    # if request.method != 'POST':
-    #     return HttpResponseNotAllowed(['POST'])
-    addition_dto = None
     try:
-        addition_dto = ItemAdditionParametersDto(**json.loads(request.body))
-    except ValueError as e:
+        _data = serializers.parse_raw_data(request.body)
+    except:
         # TODO
-        return HttpResponseServerError("hmm")
+        return HttpResponseServerError("cant deserialize")
+
+    serializer = serializers.ItemAdditionParametersSerializer(
+        data=_data
+    )
+    if not serializer.is_valid():
+        # TODO
+        return HttpResponseServerError("cant parse item")
+
+    a_param = serializer.save()
+
     # TODO handle exc
-    order_id_dto = add_item_dto_to_order(addition_dto, order_id)
+    order_id_dto = add_item_dto_to_order(a_param, order_id)
     return JsonResponse(
         order_id_dto.dict()
     )
 
 
 @require_http_methods(["PUT"])
-def change_order_status(request, order_id=None, new_status=None):
-    # if request.method != 'PUT':
-    #     return HttpResponseNotAllowed(['PUT'])
-    order = Order.objects.get(id=order_id)
+def change_order_status(request, order_id: int, new_status: str):
+    try:
+        order = Order.objects.get(id=order_id)
+    except ObjectDoesNotExist:
+        return HttpResponseServerError("not order with id=%s" % order_id)
     if not is_possible_to_change_status(order.status, new_status):
-        # TODO change return
-        return HttpResponseServerError("hmm")
+        return HttpResponseServerError("cant change status from %s to %s" % order.status, new_status)
     # TODO RabbitMQ tasks
     if new_status == OrderStatus.PAID.value:
         pass
@@ -94,21 +102,30 @@ def change_order_status(request, order_id=None, new_status=None):
     order.status = new_status
     order.save()
     return JsonResponse(
-        OrderStatusDto(
+        dto.OrderStats(
             id=order.id,
             status=order.status
         ).dict()
     )
 
 
-def add_item_dto_to_order(addition_dto: ItemAdditionParametersDto, order_id: int):
+def add_item_dto_to_order(addition_param: dto.ItemAdditionParameters, order_id: int):
+    try:
+        order = Order.objects.get(id=order_id)
+    except ObjectDoesNotExist:
+        return HttpResponseServerError("not order with id=%s" % order_id)
+
     # TODO request to warehouse: update totalCost, decrease amount
-    order = Order.objects.get(id=order_id)
-    order.totalAmount += addition_dto.amount
+    item, status_code = api.dec_existing_item(addition_param.id, addition_param.amount)
+    if status_code != 200:
+        return HttpResponseServerError("kakaya-to oshibka c order_id=%s i item_id=%s" % order_id, addition_param.id)
+    order.totalAmount += addition_param.amount
+    order.totalCost += item.price * addition_param.amount
+    order.save()
     r_item = ReservedItem(
         order_id_id=order.id,
-        item_id=addition_dto.id,
-        amount=addition_dto.amount
+        item_id=addition_param.id,
+        amount=addition_param.amount
     )
     r_item.save()
-    return OrderIdDto(id=order.id)
+    return dto.OrderId(id=order.id)

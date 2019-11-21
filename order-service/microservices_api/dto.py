@@ -1,27 +1,27 @@
-import enum
+from enum import Enum
 from pydantic import BaseModel
 
 
-class ItemDto(BaseModel):
+class Item(BaseModel):
     id: int
     name: str
     amount: int
     price: float
 
 
-class CItemDto(BaseModel):
+class CItem(BaseModel):
     name: str
     amount: int
     price: float
 
 
-class ItemAdditionParametersDto(BaseModel):
+class ItemAdditionParameters(BaseModel):
     id: int
     amount: int
     username: str
 
 
-class OrderDto(BaseModel):
+class Order(BaseModel):
     id: int
     status: str
     username: str
@@ -29,16 +29,23 @@ class OrderDto(BaseModel):
     totalAmount: int
 
 
-class OrderIdDto(BaseModel):
+class OrderId(BaseModel):
     id: int
 
 
-class OrderStatusDto(BaseModel):
+class OrderStats(BaseModel):
     id: int
     status: str
 
 
-class OrderStatus(enum.Enum):
+class ExtendedEnum(Enum):
+
+    @classmethod
+    def list(cls):
+        return list(map(lambda c: c.value, cls))
+
+
+class OrderStatus(ExtendedEnum):
     COLLECTING = "COLLECTING"
     PAID = "PAID"
     FAILED = "FAILED"
@@ -47,11 +54,11 @@ class OrderStatus(enum.Enum):
     COMPLETE = "COMPLETE"
 
 
-class CardAuthorizationInfo(enum.Enum):
+class CardAuthorizationInfo(ExtendedEnum):
     AUTHORIZED = "AUTHORIZED"
     UNAUTHORIZED = "UNAUTHORIZED"
 
 
-class UserDetailsDto(BaseModel):
+class UserDetails(BaseModel):
     username: str
-    cardAuthorizationInfo: CardAuthorizationInfo
+    cardAuthorizationInfo: str
