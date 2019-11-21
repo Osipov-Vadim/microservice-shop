@@ -1,11 +1,10 @@
 from django.http import HttpResponse, HttpResponseNotAllowed, HttpResponseServerError
 from django.http.response import JsonResponse
 from django.views.decorators.http import require_http_methods
-import json
+from django.core.exceptions import ObjectDoesNotExist
 
 from catalog_service.models.item import Item
-from catalog_service.dto.item_dto import ItemDto
-from catalog_service.dto.citem_dto import CItemDto
+from microservices_api import dto, serializers
 
 
 @require_http_methods(["GET", "POST"])
@@ -16,45 +15,60 @@ def items_handler(request):
         # return HttpResponse([i.to_dict() for i in Item.objects.all()])
     elif request.method == 'POST':
         # create items
-        item = None
         try:
-            item_dto = CItemDto(**json.loads(request.body))
-            item = Item(
-                name=item_dto.name,
-                amount=item_dto.amount,
-                price=item_dto.price)
-            item.save()
-        except ValueError as e:
-            return HttpResponseServerError("hmm")
-        return JsonResponse(ItemDto(
-            id=item.id,
-            name=item.name,
-            amount=item.amount,
-            price=item.price).dict())
-    else:
-        return HttpResponseNotAllowed(['GET', 'POST'])
+            _data = serializers.parse_raw_data(request.body)
+        except:
+            # TODO
+            return HttpResponseServerError("cant deserialize")
+
+        serializer = serializers.CItemSerializer(
+            data=_data
+        )
+        if not serializer.is_valid():
+            # TODO
+            return HttpResponseServerError("cant parse item")
+
+        c_item = serializer.save()
+        item = Item(
+            name=c_item.name,
+            amount=c_item.amount,
+            price=c_item.price)
+        item.save()
+
+        return JsonResponse(
+            dto.Item(
+                id=item.id,
+                name=item.name,
+                amount=item.amount,
+                price=item.price
+            ).dict()
+        )
+    return HttpResponseNotAllowed(['GET', 'POST'])
 
 
 @require_http_methods(["GET"])
-def get_item_by_id(request, item_id=None):
-    # if request.method != 'GET':
-    #     return HttpResponseNotAllowed(['GET'])
+def get_item_by_id(request, item_id: int):
+    try:
+        item = Item.objects.get(id=item_id)
+    except ObjectDoesNotExist:
+        return HttpResponseServerError("not item with id=%s" % item_id)
     return JsonResponse(
-        Item.objects.get(
-            id=item_id
-        ).to_dict()
+        item.to_dict()
     )
 
 
 @require_http_methods(["PUT"])
 def add_existing_item(request, item_id=None, amount=0):
-    # if request.method != 'PUT':
-    #     return HttpResponseNotAllowed(['PUT'])
-    item = Item.objects.get(id=item_id)
+    try:
+        item = Item.objects.get(id=item_id)
+    except ObjectDoesNotExist:
+        return HttpResponseServerError("not item with id=%s" % item_id)
+    if amount < 0:
+        return HttpResponseServerError("hmm, you're try to add neg amount")
     item.amount += amount
     item.save()
     return JsonResponse(
-        ItemDto(
+        dto.Item(
             id=item.id,
             name=item.name,
             amount=item.amount,
@@ -65,13 +79,16 @@ def add_existing_item(request, item_id=None, amount=0):
 
 @require_http_methods(["PUT"])
 def dec_existing_item(request, item_id=None, amount=0):
-    # if request.method != 'PUT':
-    #     return HttpResponseNotAllowed(['PUT'])
-    item = Item.objects.get(id=item_id)
+    try:
+        item = Item.objects.get(id=item_id)
+    except ObjectDoesNotExist:
+        return HttpResponseServerError("not item with id=%s" % item_id)
+    if amount < 0:
+        return HttpResponseServerError("hmm, you're try to dec pos amount")
     item.amount -= amount
     item.save()
     return JsonResponse(
-        ItemDto(
+        dto.Item(
             id=item.id,
             name=item.name,
             amount=item.amount,
