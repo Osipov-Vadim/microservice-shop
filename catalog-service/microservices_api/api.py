@@ -15,11 +15,11 @@ class ServiceNames(enum.Enum):
 def get_service_address(service_name: ServiceNames):
     # order-service:80
     if service_name == ServiceNames.CatalogService:
-        return "127.0.0.1:9003"
+        return "catalog-service:80"
     elif service_name == ServiceNames.OrderService:
-        return "127.0.0.1:9002"
+        return "order-service:80"
     elif service_name == ServiceNames.PaymentService:
-        return "127.0.0.1:9001"
+        return "payment-service:80"
     else:
         return None
 

@@ -2,6 +2,7 @@ from django.http import HttpResponse, HttpResponseNotAllowed, HttpResponseServer
 from django.http.response import JsonResponse
 from django.views.decorators.http import require_http_methods
 from django.core.exceptions import ObjectDoesNotExist
+from django.db import transaction
 
 from catalog_service.models.item import Item
 from microservices_api import dto, serializers
@@ -58,13 +59,13 @@ def get_item_by_id(request, item_id: int):
 
 
 @require_http_methods(["PUT"])
+@transaction.atomic
 def add_existing_item(request, item_id=None, amount=0):
     try:
         item = Item.objects.get(id=item_id)
     except ObjectDoesNotExist:
         return HttpResponseServerError("not item with id=%s" % item_id)
-    if amount < 0:
-        return HttpResponseServerError("hmm, you're try to add neg amount")
+
     item.amount += amount
     item.save()
     return JsonResponse(
@@ -83,8 +84,6 @@ def dec_existing_item(request, item_id=None, amount=0):
         item = Item.objects.get(id=item_id)
     except ObjectDoesNotExist:
         return HttpResponseServerError("not item with id=%s" % item_id)
-    if amount < 0:
-        return HttpResponseServerError("hmm, you're try to dec pos amount")
     item.amount -= amount
     item.save()
     return JsonResponse(

@@ -1,6 +1,5 @@
-djangorestframework
 django
+djangorestframework
 pydantic
 requests
-falcon
 python-statemachine

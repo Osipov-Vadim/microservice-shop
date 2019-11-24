@@ -1,6 +1,4 @@
-djangorestframework
 django
-django-rest-swagger
 pydantic
 requests
-falcon
+djangorestframework
