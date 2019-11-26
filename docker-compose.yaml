@@ -1,6 +1,25 @@
 version: '3'
 
 services:
+
+  consul_server:
+    build:
+      context: ./consul_server
+      dockerfile: Dockerfile
+    image: consul_server
+    ports:
+      - 8300:8300
+      - 8301:8301
+      - 8302:8302
+      - 8400:8400
+      - 8500:8500
+    environment:
+      - NODE=consul_server
+      - PRIVATE_IP_ADDRESS=33.10.0.2
+    networks:
+      consul_network:
+        ipv4_address: 33.10.0.2
+
   api-gateway:
     container_name: api-gateway
     build: ./api-gateway
@@ -34,5 +53,29 @@ services:
     container_name: catalog-service
     build: ./catalog-service
     ports:
-      - 9003:80
+      - 9003:9003
     restart: always
+    
+
+    environment:
+      - NODE=catalog_service
+      - PRIVATE_IP_ADDRESS=33.10.0.3
+    dns:
+      - 127.0.0.1
+      - 8.8.8.8
+      - 8.8.4.4
+    depends_on:
+      - consul_server
+    cap_add:
+      - NET_ADMIN
+    networks:
+      consul_network:
+        ipv4_address: 33.10.0.3
+
+
+networks:
+  consul_network:
+    driver: bridge
+    ipam:
+     config:
+       - subnet: 33.10.0.0/16

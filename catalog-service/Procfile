@@ -1,0 +1,4 @@
+catalog_sevice: /code/catalog_service.sh
+
+# Consul Client Agent
+consul: /opt/consul.sh
