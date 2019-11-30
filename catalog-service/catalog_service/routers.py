@@ -2,49 +2,41 @@ from django.http import HttpResponse, HttpResponseNotAllowed, HttpResponseServer
 from django.http.response import JsonResponse
 from django.views.decorators.http import require_http_methods
 from django.core.exceptions import ObjectDoesNotExist
+from django.core.exceptions import ValidationError
 from django.db import transaction
 
-from catalog_service.models.item import Item
+from catalog_service.models.item import Item, CreateItemSerializer
 from microservices_api import dto, serializers
+from microservices_api.api import json_error
 
 
-@require_http_methods(["GET", "POST"])
-def items_handler(request):
-    if request.method == 'GET':
-        # get all items
-        return JsonResponse(list(Item.objects.all().values()), safe=False)
-        # return HttpResponse([i.to_dict() for i in Item.objects.all()])
-    elif request.method == 'POST':
-        # create items
-        try:
-            _data = serializers.parse_raw_data(request.body)
-        except:
-            # TODO
-            return HttpResponseServerError("cant deserialize")
+@require_http_methods(["GET"])
+def get_items(request):
+    return JsonResponse(
+        data={"items: ": list(Item.objects.all().values())}
+        # model_serializers.serialize("json", Item.objects.all()),
+    )
 
-        serializer = serializers.CItemSerializer(
-            data=_data
-        )
-        if not serializer.is_valid():
-            # TODO
-            return HttpResponseServerError("cant parse item")
 
-        c_item = serializer.save()
-        item = Item(
-            name=c_item.name,
-            amount=c_item.amount,
-            price=c_item.price)
-        item.save()
-
+@require_http_methods(["POST"])
+def create_items(request):
+    _data = serializers.parse_raw_data(request.body)
+    if _data is None:
+        # TODO
         return JsonResponse(
-            dto.Item(
-                id=item.id,
-                name=item.name,
-                amount=item.amount,
-                price=item.price
-            ).dict()
+            data=json_error("cant deserialize"),
+            status=500
         )
-    return HttpResponseNotAllowed(['GET', 'POST'])
+
+    c_item = CreateItemSerializer(data=_data)
+    if not c_item.is_valid():
+        # TODO
+        return JsonResponse(
+            data=json_error("cant parse item: %s" % c_item.error_messages),
+            status=500
+        )
+    item = c_item.save()
+    return JsonResponse(item.to_dict())
 
 
 @require_http_methods(["GET"])
@@ -52,45 +44,54 @@ def get_item_by_id(request, item_id: int):
     try:
         item = Item.objects.get(id=item_id)
     except ObjectDoesNotExist:
-        return HttpResponseServerError("not item with id=%s" % item_id)
+        return JsonResponse(
+            data=json_error("not item with id = %s" % item_id),
+            status=500
+        )
     return JsonResponse(
         item.to_dict()
     )
 
 
 @require_http_methods(["PUT"])
-@transaction.atomic
 def add_existing_item(request, item_id=None, amount=0):
-    try:
-        item = Item.objects.get(id=item_id)
-    except ObjectDoesNotExist:
-        return HttpResponseServerError("not item with id=%s" % item_id)
-
-    item.amount += amount
-    item.save()
-    return JsonResponse(
-        dto.Item(
-            id=item.id,
-            name=item.name,
-            amount=item.amount,
-            price=item.price
-        ).dict()
-    )
+    with transaction.atomic():
+        item_qs = Item.objects.select_for_update().filter(pk=item_id)
+        if not item_qs.exists():
+            return JsonResponse(
+                data=json_error("not item with id = %s" % item_id),
+                status=500
+            )
+        item = item_qs.first()
+        try:
+            item.change_amount(amount)
+        except ValidationError as e:
+            return JsonResponse(
+                data=json_error(e.message),
+                status=500
+            )
+        return JsonResponse(
+            item.to_dict()
+        )
 
 
 @require_http_methods(["PUT"])
 def dec_existing_item(request, item_id=None, amount=0):
-    try:
-        item = Item.objects.get(id=item_id)
-    except ObjectDoesNotExist:
-        return HttpResponseServerError("not item with id=%s" % item_id)
-    item.amount -= amount
-    item.save()
-    return JsonResponse(
-        dto.Item(
-            id=item.id,
-            name=item.name,
-            amount=item.amount,
-            price=item.price
-        ).dict()
-    )
+    with transaction.atomic():
+        item_qs = Item.objects.select_for_update().filter(pk=item_id)
+        if not item_qs.exists():
+            return JsonResponse(
+                data=json_error("not item with id = %s" % item_id),
+                status=500
+            )
+        item = item_qs.first()
+        try:
+            item.change_amount(-amount)
+        except ValidationError as e:
+            return JsonResponse(
+                data=json_error(e.message),
+                status=500
+            )
+        return JsonResponse(
+            item.to_dict()
+        )

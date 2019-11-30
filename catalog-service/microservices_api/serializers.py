@@ -4,11 +4,24 @@ import json
 
 
 def parse_raw_data(data):
-    return json.loads(data.decode('utf-8'))
+    _data = None
+    try:
+        _data = json.loads(data.decode('utf-8'))
+    except TypeError as e:
+        pass
+    return _data
 
 
 def get_raw_data(data):
     return json.dumps(data)
+
+
+def get_request_body_obj(request):
+    if not isinstance(request.body, dict):
+        raise TypeError(
+            'cant deserialize'
+        )
+    return request.body
 
 
 class ItemSerializer(serializers.Serializer):

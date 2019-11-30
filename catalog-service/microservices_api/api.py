@@ -14,8 +14,9 @@ class ServiceNames(enum.Enum):
 # TODO Integrate Discovery service
 def get_service_address(service_name: ServiceNames):
     # order-service:80
+    # 127.0.0.1:9003
     if service_name == ServiceNames.CatalogService:
-        return "catalog-service:80"
+        return "127.0.0.1:9003"
     elif service_name == ServiceNames.OrderService:
         return "order-service:80"
     elif service_name == ServiceNames.PaymentService:
@@ -44,7 +45,7 @@ def get_items(do_not_create=False):
 
 def create_item(data, raw_data=False, do_not_create=False):
     address = get_service_address(ServiceNames.CatalogService)
-    request_url = "http://%s/items/" % (
+    request_url = "http://%s/items/create/" % (
         address
     )
     _data = data if raw_data is True else serializers.get_raw_data(data)
@@ -85,7 +86,7 @@ def add_existing_item(item_id: int, amount: int, do_not_create=False):
     return serializers.ItemSerializer.create(validated_data=response.text), response.status_code
 
 
-def dec_existing_item(item_id: int, amount: int,  do_not_create=False):
+def dec_existing_item(item_id: int, amount: int, do_not_create=False):
     address = get_service_address(ServiceNames.CatalogService)
     request_url = "http://%s/items/%s/decrease/%s/" % (
         address,
@@ -189,3 +190,7 @@ def perform_payment(order_id: int, data, raw_data=False, do_not_create=False):
     #     return response.text
 
     return serializers.OrderIdSerializer.create(validated_data=response.text)
+
+
+def json_error(msg: str):
+    return {"error": "%s" % msg}

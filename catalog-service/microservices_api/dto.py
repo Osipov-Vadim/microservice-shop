@@ -62,3 +62,4 @@ class CardAuthorizationInfo(ExtendedEnum):
 class UserDetails(BaseModel):
     username: str
     cardAuthorizationInfo: str
+
