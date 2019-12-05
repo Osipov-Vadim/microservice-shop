@@ -2,6 +2,7 @@ version: '3'
 
 services:
   api-gateway:
+    # image: annaksatn/api
     container_name: api-gateway
     build: ./api-gateway
     ports:
@@ -17,6 +18,7 @@ services:
       - catalog-service
 
   payment-service:
+    # image: annaksatn/payment
     container_name: payment-service
     build: ./payment-service
     ports:
@@ -24,6 +26,7 @@ services:
     restart: always
 
   order-service:
+    # image: annaksatn/order
     container_name: order-service
     build: ./order-service
     ports:
@@ -31,6 +34,7 @@ services:
     restart: always
 
   catalog-service:
+    # image: annaksatn/catalog
     container_name: catalog-service
     build: ./catalog-service
     ports:
