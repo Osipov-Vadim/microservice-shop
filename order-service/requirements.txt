@@ -3,3 +3,5 @@ djangorestframework
 pydantic
 requests
 python-statemachine
+celery
+kombu

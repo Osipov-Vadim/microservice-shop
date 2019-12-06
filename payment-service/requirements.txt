@@ -2,3 +2,5 @@ django
 pydantic
 requests
 djangorestframework
+celery
+kombu

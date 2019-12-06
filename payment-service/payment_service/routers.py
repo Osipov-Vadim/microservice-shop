@@ -2,9 +2,17 @@ from django.http.response import JsonResponse, HttpResponse, HttpResponseServerE
 from django.views.decorators.http import require_http_methods
 from django.core.exceptions import ObjectDoesNotExist
 
+from .celery import send_me_a_message
 from microservices_api import dto, serializers
 
 from payment_service.models import PaymentStatus, PaymentInfo
+
+
+
+@require_http_methods(["GET"])
+def check_order(request):
+    send_me_a_message('world!')
+    return HttpResponseServerError("cant parse user detail")
 
 
 @require_http_methods(["PUT"])

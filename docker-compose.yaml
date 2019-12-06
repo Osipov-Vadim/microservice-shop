@@ -17,21 +17,27 @@ services:
       - order-service
       - catalog-service
 
-  payment-service:
+  payment-service: &payment-service
     # image: annaksatn/payment
     container_name: payment-service
     build: ./payment-service
     ports:
       - 9001:80
     restart: always
+    depends_on:
+      - rabbitmq
+      - payment-celery
 
-  order-service:
+  order-service: &order-service
     # image: annaksatn/order
     container_name: order-service
     build: ./order-service
     ports:
       - 9002:80
     restart: always
+    depends_on:
+      - rabbitmq
+      - order-celery
 
   catalog-service:
     # image: annaksatn/catalog
@@ -40,3 +46,29 @@ services:
     ports:
       - 9003:80
     restart: always
+
+  rabbitmq:
+    image: "rabbitmq:3-management"
+    environment:
+      RABBITMQ_DEFAULT_USER: "user"
+      RABBITMQ_DEFAULT_PASS: "pass"
+    ports:
+      - "15672:15672"
+      - "5672:5672"
+
+  order-celery:
+    <<: *order-service
+    command: celery -A order_service worker
+    container_name: order-celery
+    ports: []
+    depends_on:
+      - rabbitmq
+
+
+  payment-celery:
+    <<: *payment-service
+    command: celery -A payment_service worker
+    container_name: payment-celery
+    ports: []
+    depends_on:
+      - rabbitmq
