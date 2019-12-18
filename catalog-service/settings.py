@@ -24,7 +24,7 @@ SECRET_KEY = 'g=%@(gx!$swad@g8plisn!+kstt)q741hvoqxmwr29cpfn!e6l'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['localhost', '127.0.0.1', 'catalog-service']
+ALLOWED_HOSTS = ['localhost', '127.0.0.1', 'catalog-service', '192.168.99.101']
 
 # Application definition
 
