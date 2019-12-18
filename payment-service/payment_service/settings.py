@@ -80,6 +80,7 @@ DATABASES = {
     }
 }
 
+# CELERY_BROKER_URL = "amqp://payment:12345@rabbitmq"
 
 # Password validation
 # https://docs.djangoproject.com/en/2.2/ref/settings/#auth-password-validators

@@ -9,7 +9,7 @@ os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'payment_service.settings')
 
 my_queue = Queue('MsQueue', Exchange('MsExchange'))
 
-app = Celery('payment_service', broker ='amqp://payment:12345@192.168.99.101:5672')
+app = Celery('payment_service', broker ='amqp://payment:12345@rabbitmq')
 
 app.config_from_object('django.conf:settings', namespace='CELERY')
 

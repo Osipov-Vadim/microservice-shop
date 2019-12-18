@@ -9,7 +9,7 @@ os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'order_service.settings')
 
 my_queue = Queue('MsQueue', Exchange('MsExchange'))
 
-app = Celery('order_service', broker ='amqp://order:12345@192.168.99.101:5672')
+app = Celery('order_service', broker ='amqp://order:12345@rabbitmq')
 
 app.config_from_object('django.conf:settings', namespace='CELERY')
 
