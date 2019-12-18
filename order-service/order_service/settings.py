@@ -25,7 +25,7 @@ SECRET_KEY = 'z8d%_-!oekpo83w5ki_as$--1*39r@wgxuh3_xsm_hq35gd(ci'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['*', '192.168.99.101']
+ALLOWED_HOSTS = ['*', '192.168.99.101', '192.168.99.100']
 
 
 # Application definition
@@ -38,6 +38,8 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'order_service',
+    'django_celery_results',
+    'celery_results',
 ]
 
 MIDDLEWARE = [
@@ -81,7 +83,7 @@ DATABASES = {
 }
 
 # CELERY_BROKER_URL = "amqp://order:12345@rabbitmq"
-
+CELERY_RESULT_BACKEND = 'django-db'
 # Password validation
 # https://docs.djangoproject.com/en/2.2/ref/settings/#auth-password-validators
 

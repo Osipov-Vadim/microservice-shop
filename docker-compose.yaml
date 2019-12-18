@@ -58,7 +58,7 @@ services:
 
   order-celery:
     <<: *order-service
-    command: celery -A order_service worker
+    command: bash -c "python manage.py migrate celery_results &&  celery -A order_service worker -B"
     container_name: order-celery
     ports: []
     depends_on:
@@ -67,7 +67,7 @@ services:
 
   payment-celery:
     <<: *payment-service
-    command: celery -A payment_service worker
+    command: celery -A payment_service worker -B
     container_name: payment-celery
     ports: []
     depends_on:

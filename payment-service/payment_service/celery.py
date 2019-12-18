@@ -4,6 +4,9 @@ from celery import Celery
 from celery import bootsteps
 from kombu import Consumer, Exchange, Queue
 from celery import shared_task
+from celery.execute import send_task
+
+
 
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'payment_service.settings')
 
@@ -22,11 +25,18 @@ def debug_task(self):
 
 @shared_task
 def send_me_a_message(who, producer=None):
-    with app.producer_or_acquire(producer) as producer:
-        producer.publish(
-            {'hello': who},
-            serializer='json',
-            exchange=my_queue.exchange,
-            declare=[my_queue],
-            retry=True,
-        )
+    send_task('test', kwargs={'id': 1, 'new_status': "PAID"})
+    # app.send_task('change_order_status')
+    # payload = {'fun': change_order_status}
+    # with app.producer_or_acquire(producer) as producer:
+    #     producer.publish(
+    #         payload,
+    #         serializer='pickle',
+    #         exchange=my_queue.exchange,
+    #         declare=[my_queue],
+    #         retry=True,
+    #     )
+
+
+def change_order_status(self):
+    print("adwd")

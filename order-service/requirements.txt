@@ -5,3 +5,4 @@ requests
 python-statemachine
 celery
 kombu
+django-celery-results
