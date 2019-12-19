@@ -34,15 +34,13 @@ services:
   #     - rabbitmq
   #     - payment-celery
 
-  db:
+  order-database:
     image: postgres:9.6
-    container_name: db
-
+    container_name: order-database
     environment:
       POSTGRES_USER: 'order'
       POSTGRES_PASSWORD: '12345'
       POSTGRES_DB: 'orders'
-
     volumes: 
       - ./pgdata:/var/lib/pgsql/data
       # - ./pgdata:/var/lib/postgresql/data
@@ -60,7 +58,7 @@ services:
     depends_on:
       # - rabbitmq
       # - order-celery
-      - db
+      - order-database
 
   # catalog-service:
   #   # image: annaksatn/catalog
