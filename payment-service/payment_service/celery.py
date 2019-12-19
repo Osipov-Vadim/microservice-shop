@@ -25,18 +25,15 @@ def debug_task(self):
 
 @shared_task
 def send_me_a_message(who, producer=None):
-    send_task('test', kwargs={'id': 1, 'new_status': "PAID"})
+    # send_task('test', kwargs={'id': 1, 'new_status': "PAID"})
     # app.send_task('change_order_status')
     # payload = {'fun': change_order_status}
-    # with app.producer_or_acquire(producer) as producer:
-    #     producer.publish(
-    #         payload,
-    #         serializer='pickle',
-    #         exchange=my_queue.exchange,
-    #         declare=[my_queue],
-    #         retry=True,
-    #     )
 
-
-def change_order_status(self):
-    print("adwd")
+    with app.producer_or_acquire(producer) as producer:
+        producer.publish(
+            {'id': 1,
+            'status': "PAID"},
+            serializer='json',
+            exchange=my_queue.exchange,
+            declare=[my_queue],
+            retry=True)

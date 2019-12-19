@@ -44,8 +44,8 @@ services:
       POSTGRES_USER: 'order'
       POSTGRES_PASSWORD: '12345'
       POSTGRES_DB: 'orders'
-    volumes: 
-      - ./pgdata:/var/lib/pgsql/data
+    # volumes: 
+    #   - ./pgdata:/var/lib/pgsql/data
       # - ./pgdata:/var/lib/postgresql/data
     ports:
       - '5432:5432'

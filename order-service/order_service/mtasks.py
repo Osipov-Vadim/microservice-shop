@@ -1,6 +1,5 @@
 from __future__ import absolute_import, unicode_literals
 from celery import shared_task
-from .models import Order, OrderStatus, ReservedItem, is_possible_to_change_status
 from django.http import HttpResponse, HttpResponseServerError
 from django.http.response import JsonResponse
 from django.core.exceptions import ObjectDoesNotExist
@@ -11,14 +10,11 @@ from django.core.exceptions import ObjectDoesNotExist
 #     print(arg['a'])
 
 
-
-@shared_task(name="test")
-def change_order_status(**args):
-    
-    order_id = int(args['id'])
-    new_status = args['new_status']
+# @shared_task(name="test")
+def change_order_status(order_id: int, new_status: str):
 
     print('Received order: {0!r}'.format(order_id))
+    from .models import Order, OrderStatus, ReservedItem, is_possible_to_change_status
     try:
         order = Order.objects.get(id=order_id)
     except ObjectDoesNotExist:
