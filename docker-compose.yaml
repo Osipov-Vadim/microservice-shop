@@ -23,16 +23,19 @@ services:
   #     - catalog-service
   #     - db
 
-  # payment-service: &payment-service
-  #   # image: annaksatn/payment
-  #   container_name: payment-service
-  #   build: ./payment-service
-  #   ports:
-  #     - 9001:80
-  #   restart: always
-  #   depends_on:
-  #     - rabbitmq
-  #     - payment-celery
+  rabbitmq:
+    image: "rabbitmq:3-management"
+    environment:
+      RABBITMQ_DEFAULT_USER: "user"
+      RABBITMQ_DEFAULT_PASS: "pass"
+    ports:
+      - "15672:15672"
+      - "5672:5672"
+
+
+#######################
+#### ORDER SERVICE ####
+#######################
 
   order-database:
     image: postgres:9.6
@@ -47,8 +50,7 @@ services:
     ports:
       - '5432:5432'
 
-  order-service: 
-    # &order-service
+  order-service: &order-service
     # image: annaksatn/order
     container_name: order-service
     build: ./order-service
@@ -56,9 +58,48 @@ services:
     ports:
       - 9002:80
     depends_on:
-      # - rabbitmq
-      # - order-celery
+      - rabbitmq
+      - order-celery
       - order-database
+
+  order-celery:
+    <<: *order-service
+    restart: always
+    command:  bash -c "celery -A order_service worker"
+    container_name: order-celery
+    ports: []
+    depends_on:
+      - rabbitmq
+      - order-database
+
+
+#########################
+#### PAYMENT SERVICE ####
+#########################
+
+  payment-service: &payment-service
+    # image: annaksatn/payment
+    container_name: payment-service
+    build: ./payment-service
+    ports:
+      - 9001:80
+    restart: always
+    depends_on:
+      - rabbitmq
+      - payment-celery
+
+
+  payment-celery:
+    <<: *payment-service
+    command: celery -A payment_service worker -B
+    container_name: payment-celery
+    ports: []
+    depends_on:
+      - rabbitmq
+
+#########################
+#### CATALOG SERVICE ####
+#########################
 
   # catalog-service:
   #   # image: annaksatn/catalog
@@ -68,31 +109,5 @@ services:
   #     - 9003:80
   #   restart: always
 
-  # rabbitmq:
-  #   image: "rabbitmq:3-management"
-  #   environment:
-  #     RABBITMQ_DEFAULT_USER: "user"
-  #     RABBITMQ_DEFAULT_PASS: "pass"
-  #   ports:
-  #     - "15672:15672"
-  #     - "5672:5672"
 
-  # order-celery:
-  #   <<: *order-service
-  #   restart: always
-  #   command:  bash -c "python3 ./manage.py migrate && celery -A order_service worker"
-  #   container_name: order-celery
-  #   ports: []
-  #   depends_on:
-  #     - rabbitmq
-  #     - db
-
-
-  # payment-celery:
-  #   <<: *payment-service
-  #   command: celery -A payment_service worker -B
-  #   container_name: payment-celery
-  #   ports: []
-  #   depends_on:
-  #     - rabbitmq
 
