@@ -1,74 +1,100 @@
 version: '3'
 
+volumes:
+  pgdata:
+
+
 services:
-  api-gateway:
-    # image: annaksatn/api
-    container_name: api-gateway
-    build: ./api-gateway
-    ports:
-      - 9000:80
-    restart: always
-    links:
-      - payment-service
-      - order-service
-      - catalog-service
-    depends_on:
-      - payment-service
-      - order-service
-      - catalog-service
 
-  payment-service: &payment-service
-    # image: annaksatn/payment
-    container_name: payment-service
-    build: ./payment-service
-    ports:
-      - 9001:80
-    restart: always
-    depends_on:
-      - rabbitmq
-      - payment-celery
+  # api-gateway:
+  #   # image: annaksatn/api
+  #   container_name: api-gateway
+  #   build: ./api-gateway
+  #   ports:
+  #     - 9000:80
+  #   restart: always
+  #   links:
+  #     - payment-service
+  #     - order-service
+  #     - catalog-service
+  #   depends_on:
+  #     - payment-service
+  #     - order-service
+  #     - catalog-service
+  #     - db
 
-  order-service: &order-service
+  # payment-service: &payment-service
+  #   # image: annaksatn/payment
+  #   container_name: payment-service
+  #   build: ./payment-service
+  #   ports:
+  #     - 9001:80
+  #   restart: always
+  #   depends_on:
+  #     - rabbitmq
+  #     - payment-celery
+
+  db:
+    image: postgres:9.6
+    container_name: db
+
+    environment:
+      POSTGRES_USER: 'order'
+      POSTGRES_PASSWORD: '12345'
+      POSTGRES_DB: 'orders'
+
+    volumes: 
+      - ./pgdata:/var/lib/pgsql/data
+      # - ./pgdata:/var/lib/postgresql/data
+    ports:
+      - '5432:5432'
+
+  order-service: 
+    # &order-service
     # image: annaksatn/order
     container_name: order-service
     build: ./order-service
+    command: bash -c "python3 ./manage.py makemigrations  && python3 ./manage.py migrate && python3 ./manage.py runserver 0.0.0.0:80"
     ports:
       - 9002:80
-    restart: always
     depends_on:
-      - rabbitmq
-      - order-celery
+      # - rabbitmq
+      # - order-celery
+      - db
 
-  catalog-service:
-    # image: annaksatn/catalog
-    container_name: catalog-service
-    build: ./catalog-service
-    ports:
-      - 9003:80
-    restart: always
+  # catalog-service:
+  #   # image: annaksatn/catalog
+  #   container_name: catalog-service
+  #   build: ./catalog-service
+  #   ports:
+  #     - 9003:80
+  #   restart: always
 
-  rabbitmq:
-    image: "rabbitmq:3-management"
-    environment:
-      RABBITMQ_DEFAULT_USER: "user"
-      RABBITMQ_DEFAULT_PASS: "pass"
-    ports:
-      - "15672:15672"
-      - "5672:5672"
+  # rabbitmq:
+  #   image: "rabbitmq:3-management"
+  #   environment:
+  #     RABBITMQ_DEFAULT_USER: "user"
+  #     RABBITMQ_DEFAULT_PASS: "pass"
+  #   ports:
+  #     - "15672:15672"
+  #     - "5672:5672"
 
-  order-celery:
-    <<: *order-service
-    command: bash -c "python manage.py migrate celery_results &&  celery -A order_service worker -B"
-    container_name: order-celery
-    ports: []
-    depends_on:
-      - rabbitmq
+  # order-celery:
+  #   <<: *order-service
+  #   restart: always
+  #   command:  bash -c "python3 ./manage.py migrate && celery -A order_service worker"
+  #   container_name: order-celery
+  #   ports: []
+  #   depends_on:
+  #     - rabbitmq
+  #     - db
 
 
-  payment-celery:
-    <<: *payment-service
-    command: celery -A payment_service worker -B
-    container_name: payment-celery
-    ports: []
-    depends_on:
-      - rabbitmq
+  # payment-celery:
+  #   <<: *payment-service
+  #   command: celery -A payment_service worker -B
+  #   container_name: payment-celery
+  #   ports: []
+  #   depends_on:
+  #     - rabbitmq
+

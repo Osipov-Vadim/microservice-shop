@@ -38,8 +38,6 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'order_service',
-    'django_celery_results',
-    'celery_results',
 ]
 
 MIDDLEWARE = [
@@ -75,12 +73,18 @@ WSGI_APPLICATION = 'wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/2.2/ref/settings/#databases
 
+
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'db_order_service.sqlite3'),
+        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        'NAME': 'orders',
+        'USER' : 'order',
+        'PASSWORD' : '12345',
+        'HOST' : '192.168.99.100',
+        'PORT' : '5432',
     }
 }
+
 
 CELERY_BROKER_URL = "ampq://localhost"
 

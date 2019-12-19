@@ -6,8 +6,11 @@ RUN pip3 install -r /home/docker/code/requirements.txt
 COPY . /home/docker/code/
 WORKDIR /home/docker/code/
 
-RUN python3 ./manage.py makemigrations && python3 ./manage.py migrate
+VOLUME /my_volume
+
+RUN pip install psycopg2-binary
+# RUN python3 ./manage.py makemigrations && python3 ./manage.py migrate
 # RUN python3 ./manage.py collectstatic
 
-CMD python3 ./manage.py runserver 0.0.0.0:80
+# CMD python3 ./manage.py runserver 0.0.0.0:80
 EXPOSE 80
