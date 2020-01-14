@@ -24,14 +24,14 @@ def debug_task(self):
     print('Request: {0!r}'.format(self.request))
 
 @shared_task
-def send_me_a_message(who, producer=None):
+def send_me_a_message(id_order: str, producer=None):
     # send_task('test', kwargs={'id': 1, 'new_status': "PAID"})
     # app.send_task('change_order_status')
     # payload = {'fun': change_order_status}
 
     with app.producer_or_acquire(producer) as producer:
         producer.publish(
-            {'id': 1,
+            {'id': id_order,
             'status': "PAID"},
             serializer='json',
             exchange=my_queue.exchange,

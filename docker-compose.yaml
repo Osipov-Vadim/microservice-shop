@@ -6,22 +6,22 @@ volumes:
 
 services:
 
-  # api-gateway:
-  #   # image: annaksatn/api
-  #   container_name: api-gateway
-  #   build: ./api-gateway
-  #   ports:
-  #     - 9000:80
-  #   restart: always
-  #   links:
-  #     - payment-service
-  #     - order-service
-  #     - catalog-service
-  #   depends_on:
-  #     - payment-service
-  #     - order-service
-  #     - catalog-service
-  #     - db
+  api-gateway:
+    # image: annaksatn/api
+    container_name: api-gateway
+    build: ./api-gateway
+    ports:
+      - 9000:80
+    restart: always
+    links:
+      - payment-service
+      - order-service
+      - catalog-service
+    depends_on:
+      - payment-service
+      - order-service
+      - catalog-service
+
 
   rabbitmq:
     image: "rabbitmq:3-management"
@@ -101,13 +101,13 @@ services:
 #### CATALOG SERVICE ####
 #########################
 
-  # catalog-service:
-  #   # image: annaksatn/catalog
-  #   container_name: catalog-service
-  #   build: ./catalog-service
-  #   ports:
-  #     - 9003:80
-  #   restart: always
+  catalog-service:
+    # image: annaksatn/catalog
+    container_name: catalog-service
+    build: ./catalog-service
+    ports:
+      - 9003:80
+    restart: always
 
 
 

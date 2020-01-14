@@ -11,7 +11,7 @@ from payment_service.models import PaymentStatus, PaymentInfo
 
 @require_http_methods(["GET"])
 def check_order(request):
-    send_me_a_message('world!')
+    send_me_a_message('5')
     return HttpResponseServerError("cant parse user detail")
 
 
@@ -42,6 +42,8 @@ def perform_payment(request, order_id: int):
     # TODO need to check order id status and check existing order id in order-service
     payment_info = PaymentInfo(order_id=order_id, paymentStatus=PaymentStatus.PAYING)
     payment_info.save()
+
+    send_me_a_message(str(order_id))
 
     return JsonResponse(
         dto.OrderId(
